@@ -1,95 +1,67 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client'
+import Show from '@/Components/ShowTasks/page';
+import styles from './page.module.css';
+import {useState} from 'react';
 
+export type taskType={
+  title: string,
+  id: number,
+}
 export default function Home() {
+  // const initialTask : taskType = [{
+  //   title: '',
+  //   id: null,
+  // }]
+  const [task,setTask] = useState<taskType[]>([]);
+  const [input,setInput] = useState('');
+  const [edit,setEdit] = useState<boolean>(false);
+
+  function handleInput(a:string){
+   setInput(a)
+   
+  }
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    if(!edit){
+
+      if(input!==''){
+        setTask([...task,{
+          title: input,
+          id: task.length,
+        }])
+        setInput('');
+      }
+    }
+  }
+  const deleteTask=(id:number|null)=>{
+    let newArr = task.filter((i)=>i.id!=id);
+    setTask(newArr)
+  }
+  const editTask=(id:number)=>{
+    let text = task[id].title;
+   setInput(text);
+   setEdit(true);
+  }
+  const saveEdit=(id:number)=>{
+    let arr = [...task];
+    arr.splice(id,1,{ title:input,
+      id:id})
+    setTask(arr);
+    setEdit(false);
+  }
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+   <>
+   <div className={styles.container}>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+   <h1 className={styles.heading}>Todo List</h1>
+   <form className={styles.form} onSubmit={(e)=>handleSubmit(e)}>
+    <input type="text" placeholder='Enter your task' value={input} onChange={(e)=>handleInput(e.target.value)}/>
+    <button type='submit'>Add</button>
+  
+   </form>
+    <Show tasks={task} deleteTask={deleteTask} editTask={editTask} saveEdit={saveEdit}/>
+   </div>
+   </>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
   )
 }
